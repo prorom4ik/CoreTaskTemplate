@@ -25,7 +25,6 @@ public class UserDaoJDBCImpl implements UserDao {
             statement.execute(sql);
             connection.commit();
             connection.setAutoCommit(true);
-            connection.close();
             statement.close();
         } catch (SQLException e) {
             System.out.println("Возникла ошибка при создании таблицы users");
@@ -45,7 +44,6 @@ public class UserDaoJDBCImpl implements UserDao {
             statement.execute(sql);
             connection.commit();
             connection.setAutoCommit(true);
-            connection.close();
             statement.close();
         } catch (SQLException e) {
             System.out.println("Возникла ошибка при очищении таблицы users");
@@ -68,7 +66,6 @@ public class UserDaoJDBCImpl implements UserDao {
             preparedStatement.execute();
             connection.commit();
             connection.setAutoCommit(true);
-            connection.close();
             preparedStatement.close();
         } catch (SQLException e) {
             System.out.println("Возникла ошибка при добавлении пользователя");
@@ -88,7 +85,6 @@ public class UserDaoJDBCImpl implements UserDao {
             preparedStatement.setInt(1, (int) id);
             connection.commit();
             connection.setAutoCommit(true);
-            connection.close();
             preparedStatement.close();
         } catch (SQLException e) {
             System.out.println("Возникла ошибка при удалении пользователя");
@@ -118,7 +114,6 @@ public class UserDaoJDBCImpl implements UserDao {
             }
             connection.commit();
             connection.setAutoCommit(true);
-            connection.close();
             statement.close();
         } catch (SQLException e) {
             System.out.println("Возникла ошибка при извлечении пользователей");
@@ -139,7 +134,6 @@ public class UserDaoJDBCImpl implements UserDao {
             statement.executeUpdate(sql);
             connection.commit();
             connection.setAutoCommit(true);
-            connection.close();
             statement.close();
         } catch (SQLException e) {
             System.out.println("Возникла ошибка при удалении таблицы users");
