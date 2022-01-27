@@ -3,13 +3,9 @@ package jm.task.core.jdbc.dao;
 import jm.task.core.jdbc.model.User;
 import jm.task.core.jdbc.util.Util;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import jm.task.core.jdbc.util.Util;
 
 public class UserDaoJDBCImpl implements UserDao {
 
@@ -25,17 +21,19 @@ public class UserDaoJDBCImpl implements UserDao {
         try {
             connection.setAutoCommit(false);
             statement = connection.createStatement();
-            sql = "CREATE TABLE IF NOT EXISTS users(" +
-                    "id int NOT NULL AUTO_INCREMENT," +
-                    "name varchar(50)," +
-                    "secondName varchar(50)," +
-                    "age int," +
-                    "PRIMARY KEY (id))";
-            statement.executeUpdate(sql);
+            sql = "CREATE TABLE IF NOT EXISTS users(id int NOT NULL AUTO_INCREMENT, name varchar(50), secondName varchar(50), age int, PRIMARY KEY (id))";
+            statement.execute(sql);
             connection.commit();
             connection.setAutoCommit(true);
+            connection.close();
+            statement.close();
         } catch (SQLException e) {
             System.out.println("Возникла ошибка при создании таблицы users");
+            try {
+                connection.rollback();
+            } catch (SQLException ex) {
+                System.out.println("Возникла ошибка при откате");
+            }
         }
     }
 
@@ -44,38 +42,61 @@ public class UserDaoJDBCImpl implements UserDao {
             connection.setAutoCommit(false);
             statement = connection.createStatement();
             sql = "DROP TABLE IF EXISTS users";
-            statement.executeUpdate(sql);
+            statement.execute(sql);
             connection.commit();
             connection.setAutoCommit(true);
+            connection.close();
+            statement.close();
         } catch (SQLException e) {
             System.out.println("Возникла ошибка при очищении таблицы users");
+            try {
+                connection.rollback();
+            } catch (SQLException ex) {
+                System.out.println("Возникла ошибка при откате");
+            }
         }
     }
 
     public void saveUser(String name, String lastName, byte age) {
         try {
             connection.setAutoCommit(false);
-            statement = connection.createStatement();
-            sql = "INSERT INTO users(name, secondName, age) VALUES('" +
-            name + "','" + lastName + "','" + age + "')";
-            statement.executeUpdate(sql);
+            sql = "INSERT INTO users(name, secondName, age) VALUES(?,?,?)";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setString(1, name);
+            preparedStatement.setString(2, lastName);
+            preparedStatement.setInt(3, age);
+            preparedStatement.execute();
             connection.commit();
             connection.setAutoCommit(true);
+            connection.close();
+            preparedStatement.close();
         } catch (SQLException e) {
             System.out.println("Возникла ошибка при добавлении пользователя");
+            try {
+                connection.rollback();
+            } catch (SQLException ex) {
+                System.out.println("Возникла ошибка при откате");
+            }
         }
     }
 
     public void removeUserById(long id) {
         try {
             connection.setAutoCommit(false);
-            statement = connection.createStatement();
-            sql = "DELETE FROM users WHERE id = " + id;
-            statement.executeUpdate(sql);
+            sql = "DELETE FROM users WHERE id = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1, (int) id);
             connection.commit();
             connection.setAutoCommit(true);
+            connection.close();
+            preparedStatement.close();
         } catch (SQLException e) {
             System.out.println("Возникла ошибка при удалении пользователя");
+            try {
+                connection.rollback();
+            } catch (SQLException ex) {
+                System.out.println("Возникла ошибка при откате");
+            }
         }
     }
 
@@ -97,8 +118,15 @@ public class UserDaoJDBCImpl implements UserDao {
             }
             connection.commit();
             connection.setAutoCommit(true);
+            connection.close();
+            statement.close();
         } catch (SQLException e) {
             System.out.println("Возникла ошибка при извлечении пользователей");
+            try {
+                connection.rollback();
+            } catch (SQLException ex) {
+                System.out.println("Возникла ошибка при откате");
+            }
         }
         return users;
     }
@@ -111,8 +139,15 @@ public class UserDaoJDBCImpl implements UserDao {
             statement.executeUpdate(sql);
             connection.commit();
             connection.setAutoCommit(true);
+            connection.close();
+            statement.close();
         } catch (SQLException e) {
             System.out.println("Возникла ошибка при удалении таблицы users");
+            try {
+                connection.rollback();
+            } catch (SQLException ex) {
+                System.out.println("Возникла ошибка при откате");
+            }
         }
     }
 }

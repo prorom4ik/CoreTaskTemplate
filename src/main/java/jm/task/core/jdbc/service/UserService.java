@@ -8,7 +8,7 @@ import java.util.List;
 public interface UserService {
     void createUsersTable();
 
-    void dropUsersTable() throws SQLException, ClassNotFoundException;
+    void dropUsersTable();
 
     void saveUser(String name, String lastName, byte age);
 
