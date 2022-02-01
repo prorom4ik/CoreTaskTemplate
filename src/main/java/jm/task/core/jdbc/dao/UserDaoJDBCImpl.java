@@ -10,22 +10,19 @@ import java.util.List;
 public class UserDaoJDBCImpl implements UserDao {
 
     Connection connection = Util.connectToDB();
-    Statement statement;
-    String sql;
 
     public UserDaoJDBCImpl() {
 
     }
 
     public void createUsersTable() {
+        Statement statement = null;
         try {
             connection.setAutoCommit(false);
             statement = connection.createStatement();
-            sql = "CREATE TABLE IF NOT EXISTS users(id int NOT NULL AUTO_INCREMENT, name varchar(50), secondName varchar(50), age int, PRIMARY KEY (id))";
+            String sql = "CREATE TABLE IF NOT EXISTS users(id int NOT NULL AUTO_INCREMENT, name varchar(50), secondName varchar(50), age int, PRIMARY KEY (id))";
             statement.execute(sql);
             connection.commit();
-            connection.setAutoCommit(true);
-            statement.close();
         } catch (SQLException e) {
             System.out.println("Возникла ошибка при создании таблицы users");
             try {
@@ -33,14 +30,22 @@ public class UserDaoJDBCImpl implements UserDao {
             } catch (SQLException ex) {
                 System.out.println("Возникла ошибка при откате");
             }
+        } finally {
+            try {
+                connection.setAutoCommit(true);
+                statement.close();
+            } catch (SQLException e) {
+                System.out.println("Возникла ошибка при закрытии ресурсов");
+            }
         }
     }
 
     public void dropUsersTable() {
+        Statement statement = null;
         try {
             connection.setAutoCommit(false);
             statement = connection.createStatement();
-            sql = "DROP TABLE IF EXISTS users";
+            String sql = "DROP TABLE IF EXISTS users";
             statement.execute(sql);
             connection.commit();
             connection.setAutoCommit(true);
@@ -52,14 +57,22 @@ public class UserDaoJDBCImpl implements UserDao {
             } catch (SQLException ex) {
                 System.out.println("Возникла ошибка при откате");
             }
+        } finally {
+            try {
+                connection.setAutoCommit(true);
+                statement.close();
+            } catch (SQLException e) {
+                System.out.println("Возникла ошибка при закрытии ресурсов");
+            }
         }
     }
 
     public void saveUser(String name, String lastName, byte age) {
+        PreparedStatement preparedStatement = null;
         try {
             connection.setAutoCommit(false);
-            sql = "INSERT INTO users(name, secondName, age) VALUES(?,?,?)";
-            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            String sql = "INSERT INTO users(name, secondName, age) VALUES(?,?,?)";
+            preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setString(1, name);
             preparedStatement.setString(2, lastName);
             preparedStatement.setInt(3, age);
@@ -74,14 +87,22 @@ public class UserDaoJDBCImpl implements UserDao {
             } catch (SQLException ex) {
                 System.out.println("Возникла ошибка при откате");
             }
+        } finally {
+            try {
+                connection.setAutoCommit(true);
+                preparedStatement.close();
+            } catch (SQLException e) {
+                System.out.println("Возникла ошибка при закрытии ресурсов");
+            }
         }
     }
 
     public void removeUserById(long id) {
+        PreparedStatement preparedStatement = null;
         try {
             connection.setAutoCommit(false);
-            sql = "DELETE FROM users WHERE id = ?";
-            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            String sql = "DELETE FROM users WHERE id = ?";
+            preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setInt(1, (int) id);
             connection.commit();
             connection.setAutoCommit(true);
@@ -93,16 +114,24 @@ public class UserDaoJDBCImpl implements UserDao {
             } catch (SQLException ex) {
                 System.out.println("Возникла ошибка при откате");
             }
+        } finally {
+            try {
+                connection.setAutoCommit(true);
+                preparedStatement.close();
+            } catch (SQLException e) {
+                System.out.println("Возникла ошибка при закрытии ресурсов");
+            }
         }
     }
 
     public List<User> getAllUsers() {
         List<User> users = new ArrayList<>();
         ResultSet rs = null;
+        Statement statement = null;
         try {
             connection.setAutoCommit(false);
             statement = connection.createStatement();
-            sql = "SELECT * FROM users";
+            String sql = "SELECT * FROM users";
             rs = statement.executeQuery(sql);
             while (rs.next()) {
                 User user = new User();
@@ -122,15 +151,23 @@ public class UserDaoJDBCImpl implements UserDao {
             } catch (SQLException ex) {
                 System.out.println("Возникла ошибка при откате");
             }
+        } finally {
+            try {
+                connection.setAutoCommit(true);
+                statement.close();
+            } catch (SQLException e) {
+                System.out.println("Возникла ошибка при закрытии ресурсов");
+            }
         }
         return users;
     }
 
     public void cleanUsersTable() {
+        Statement statement = null;
         try {
             connection.setAutoCommit(false);
             statement = connection.createStatement();
-            sql = "TRUNCATE TABLE users";
+            String sql = "TRUNCATE TABLE users";
             statement.executeUpdate(sql);
             connection.commit();
             connection.setAutoCommit(true);
@@ -141,6 +178,13 @@ public class UserDaoJDBCImpl implements UserDao {
                 connection.rollback();
             } catch (SQLException ex) {
                 System.out.println("Возникла ошибка при откате");
+            }
+        } finally {
+            try {
+                connection.setAutoCommit(true);
+                statement.close();
+            } catch (SQLException e) {
+                System.out.println("Возникла ошибка при закрытии ресурсов");
             }
         }
     }
