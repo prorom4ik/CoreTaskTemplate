@@ -5,6 +5,7 @@ import jm.task.core.jdbc.util.Util;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
+import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import java.util.List;
 import java.util.logging.Logger;
@@ -84,11 +85,13 @@ public class UserDaoHibernateImpl implements UserDao {
 
     @Override
     public List<User> getAllUsers() {
-        TypedQuery<User> users = null;
+        TypedQuery<User> users;
+        List<User> users1 = null;
         try (Session session = Util.getSessionFactory().openSession()) {
             Transaction transaction = session.beginTransaction();
             try {
                 users = session.createQuery("select u from User u", User.class);
+                users1 = users.getResultList();
                 transaction.commit();
             } catch (RuntimeException rtex) {
                 transaction.rollback();
@@ -97,7 +100,7 @@ public class UserDaoHibernateImpl implements UserDao {
         } catch (Exception e) {
             LOGGER.warning("Ошибка в методе UserDaoHibernateImpl.getAllUsers: " + e.getMessage());
         }
-        return (List<User>) users;
+        return users1;
     }
 
     @Override
